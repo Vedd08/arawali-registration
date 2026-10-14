@@ -43,8 +43,27 @@ async function setup() {
       version     integer NOT NULL,
       expires     timestamptz NOT NULL
     );
+    -- Everyone who has signed in, kept after their session ends.
+    -- name_key is the lowercase name, so "Priya" and "priya" are one person.
+    CREATE TABLE IF NOT EXISTS staff (
+      name_key    text PRIMARY KEY,
+      name        text NOT NULL,
+      first_seen  timestamptz NOT NULL DEFAULT now(),
+      last_seen   timestamptz NOT NULL DEFAULT now(),
+      sign_ins    integer NOT NULL DEFAULT 1
+    );
   `);
   await importJsonFiles();
+  // Staff who signed in or registered someone before the staff list existed.
+  await query(`
+    INSERT INTO staff (name_key, name, first_seen, last_seen, sign_ins)
+    SELECT lower(name), min(name), now(), now(), count(*) FROM sessions GROUP BY lower(name)
+    ON CONFLICT DO NOTHING;
+    INSERT INTO staff (name_key, name, first_seen, last_seen, sign_ins)
+    SELECT lower(staff_name), min(staff_name), min(created_at), max(created_at), 0
+    FROM registrations WHERE staff_name IS NOT NULL GROUP BY lower(staff_name)
+    ON CONFLICT DO NOTHING;
+  `);
 }
 
 // One-time move of the records the app kept in data/*.json before it used a database.
@@ -54,6 +73,10 @@ async function importJsonFiles() {
     const p = path.join(dir, file);
     return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : null;
   };
+
+  // Only a brand-new database is filled from the files. Once settings exist, the
+  // database is the record, so entries removed on the admin page stay removed.
+  if (await getSettings()) return;
 
   const { rows } = await query("SELECT count(*)::int AS n FROM registrations");
   const old = read("registrations.json");
@@ -116,6 +139,55 @@ async function findSession(tokenHash) {
 const deleteSession = (tokenHash) => query("DELETE FROM sessions WHERE token_hash = $1", [tokenHash]);
 const deleteAllSessions = () => query("DELETE FROM sessions");
 
+// ----- staff -----
+
+// The list keeps the first spelling used, so "Priya" stays "Priya" if she later types "priya".
+async function recordSignIn(name) {
+  await query(
+    `INSERT INTO staff (name_key, name) VALUES (lower($1), $1)
+     ON CONFLICT (name_key) DO UPDATE
+       SET last_seen = now(), sign_ins = staff.sign_ins + 1`,
+    [name]
+  );
+}
+
+// Every employee who has signed in, with how many customers they registered and
+// whether they are signed in right now (an unexpired session from the current password).
+async function listStaff(version) {
+  const { rows } = await query(
+    `SELECT s.name, s.first_seen, s.last_seen, s.sign_ins,
+            (SELECT count(*)::int FROM registrations r WHERE lower(r.staff_name) = s.name_key) AS registrations,
+            (SELECT max(r.created_at) FROM registrations r WHERE lower(r.staff_name) = s.name_key) AS last_registration,
+            EXISTS (SELECT 1 FROM sessions x WHERE lower(x.name) = s.name_key
+                      AND x.expires > now() AND x.version = $1) AS signed_in
+     FROM staff s
+     ORDER BY signed_in DESC, s.last_seen DESC`,
+    [version]
+  );
+  return rows.map((r) => ({
+    name: r.name,
+    firstSeen: r.first_seen.toISOString(),
+    lastSeen: r.last_seen.toISOString(),
+    signIns: r.sign_ins,
+    registrations: r.registrations,
+    lastRegistration: r.last_registration ? r.last_registration.toISOString() : null,
+    signedIn: r.signed_in,
+  }));
+}
+
+// Signs the employee out on every device. Returns how many sessions ended.
+async function signOutStaff(name) {
+  const { rowCount } = await query("DELETE FROM sessions WHERE lower(name) = lower($1)", [name]);
+  return rowCount;
+}
+
+// Removes an employee from the staff list and signs them out. Their registrations keep their name.
+async function removeStaff(name) {
+  await signOutStaff(name);
+  const { rowCount } = await query("DELETE FROM staff WHERE name_key = lower($1)", [name]);
+  return rowCount > 0;
+}
+
 // ----- registrations -----
 
 async function isRegistered(instagram) {
@@ -162,6 +234,10 @@ module.exports = {
   findSession,
   deleteSession,
   deleteAllSessions,
+  recordSignIn,
+  listStaff,
+  signOutStaff,
+  removeStaff,
   isRegistered,
   addRegistration,
   listRegistrations,

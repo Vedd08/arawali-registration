@@ -2,202 +2,292 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Arawali Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e31e24">
+<title>Admin · Arawali</title>
 <link rel="icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --red: #e31e24;
-    --red-deep: #b5161b;
-    --yellow: #ffed00;
+    --red-press: #b3141a;
+    --red-tint: #fff0f0;
+    --yellow: #ffdd00;
+    --yellow-tint: #fff8cc;
     --ink: #2b2a29;
-    --muted: #6b6866;
-    --line: #ece7e2;
-    --bg: #faf7f3;
+    --text: #44403c;
+    --muted: #78716c;
+    --line: #e7e5e2;
+    --page: #f3f3f4;
+    --white: #fff;
+    --ok: #0f7b45;
+    --display: "Baloo 2", "Nirmala UI", system-ui, sans-serif;
+    --body: "Mukta", "Nirmala UI", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   * { box-sizing: border-box; }
+  html, body { margin: 0; }
   body {
-    margin: 0;
-    font-family: "Baloo 2", system-ui, -apple-system, "Segoe UI", sans-serif;
-    color: var(--ink);
-    background: var(--bg);
+    min-height: 100vh;
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--page);
+    -webkit-font-smoothing: antialiased;
   }
-  header {
+  button, input { font: inherit; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+  /* ---------- header ---------- */
+  .top {
     background: var(--red);
     border-bottom: 5px solid var(--yellow);
-    padding: 12px 16px;
+  }
+  .top-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     gap: 14px;
   }
-  header img { height: 46px; width: auto; }
-  header span { color: #fff; font-weight: 800; font-size: 1.2rem; }
-  main { max-width: 980px; margin: 0 auto; padding: 22px 16px 40px; }
-
-  .login {
-    max-width: 360px;
-    margin: 40px auto;
-    background: #fff;
-    border: 2px solid var(--line);
-    border-radius: 16px;
-    padding: 22px;
+  .top img { height: 44px; width: auto; display: block; }
+  .top h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: #fff;
+    text-shadow: 1px 1px 0 var(--ink);
   }
-  .login h1 { margin: 0 0 10px; font-size: 1.3rem; color: var(--red); }
-  input {
-    font: inherit;
-    font-size: 1rem;
+  .top-actions { margin-left: auto; display: flex; gap: 8px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1.5px solid rgba(255,255,255,.65);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-weight: 600;
+    font-size: .95rem;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .15s, color .15s;
+  }
+  .pill:hover { background: #fff; color: var(--red); }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+
+  /* ---------- admin sign-in ---------- */
+  .gate {
+    max-width: 380px;
+    margin: 48px auto;
+    background: var(--white);
+    border-radius: 20px;
+    border-top: 6px solid var(--yellow);
+    padding: 26px 24px 22px;
+    box-shadow: 0 1px 2px rgba(43,42,41,.05), 0 20px 40px -16px rgba(43,42,41,.2);
+  }
+  .gate h2 { margin: 0; font-family: var(--display); font-size: 1.6rem; color: var(--ink); }
+  .gate p { margin: 2px 0 18px; color: var(--muted); }
+
+  input[type=text], input[type=password], input[type=search] {
     width: 100%;
-    padding: 10px 12px;
-    border: 2px solid var(--line);
+    height: 46px;
+    padding: 0 14px;
+    color: var(--ink);
+    background: #fafaf9;
+    border: 1.5px solid var(--line);
     border-radius: 10px;
     outline: none;
+    transition: border-color .15s, box-shadow .15s, background-color .15s;
   }
-  input:focus { border-color: var(--red); }
+  input:focus { background: #fff; border-color: var(--red); box-shadow: 0 0 0 4px rgba(227,30,36,.12); }
+
   .btn {
-    font: inherit;
-    font-weight: 800;
+    height: 46px;
+    padding: 0 18px;
     border: 0;
     border-radius: 10px;
-    padding: 9px 16px;
-    cursor: pointer;
     background: var(--red);
     color: #fff;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
     white-space: nowrap;
+    box-shadow: 0 3px 0 var(--red-press);
+    transition: transform .08s, box-shadow .08s;
   }
-  .btn:hover { background: var(--red-deep); }
-  .btn.ghost { background: #fff; color: var(--red); border: 2px solid var(--red); }
-  .btn.ghost:hover { background: #fff1f1; }
-  .login .btn { width: 100%; margin-top: 12px; }
-  .err { color: var(--red); font-weight: 700; min-height: 1.3em; margin-top: 8px; }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--red-press); }
+  .btn.quiet { background: #fff; color: var(--ink); border: 1.5px solid var(--line); box-shadow: none; font-family: var(--body); font-weight: 600; font-size: 1rem; }
+  .btn.quiet:hover { border-color: var(--ink); }
+  .gate .btn { width: 100%; margin-top: 12px; }
+  .note { min-height: 1.4em; margin-top: 8px; font-weight: 600; color: var(--red-press); }
+  .note.ok { color: var(--ok); }
 
-  .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 14px;
+  /* ---------- sections ---------- */
+  .summary {
+    margin: 0 0 22px;
+    font-size: 1.05rem;
+    color: var(--muted);
   }
-  .count {
-    background: var(--yellow);
-    border-radius: 999px;
-    padding: 4px 14px;
-    font-weight: 800;
-  }
-  .toolbar input { flex: 1; min-width: 180px; }
+  .summary strong { color: var(--ink); }
+  section + section { margin-top: 36px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  h2.sec { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.45rem; color: var(--ink); }
+  .hint { margin: 0 0 12px; color: var(--muted); }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .toolbar input { flex: 1; min-width: 200px; }
 
   .table-wrap {
-    background: #fff;
-    border: 2px solid var(--line);
+    background: var(--white);
+    border: 1px solid var(--line);
     border-radius: 14px;
     overflow-x: auto;
   }
-  table { width: 100%; border-collapse: collapse; font-size: .98rem; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  th { font-weight: 800; color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; background: #fffdf0; }
-  td.num { color: var(--muted); font-variant-numeric: tabular-nums; }
-  td .handle { color: var(--red); font-weight: 700; text-decoration: none; }
-  td .handle:hover { text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid #efedeb; white-space: nowrap; vertical-align: middle; }
+  th { font-weight: 600; font-size: .9rem; color: var(--muted); background: #fdfcfa; }
   tr:last-child td { border-bottom: 0; }
-  .del { background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; font-weight: 700; }
-  .del:hover { color: var(--red); }
-  .empty { padding: 30px; text-align: center; color: var(--muted); }
-  [hidden] { display: none !important; }
-  .sec { margin: 8px 0 2px; font-size: 1.35rem; font-weight: 800; color: var(--ink); }
-  .sec + .hint { margin: 0 0 12px; color: var(--muted); }
-  #panel > .sec:not(:first-child) { margin-top: 36px; }
-  #pwForm { margin-bottom: 0; }
-  #pwForm input { max-width: 360px; }
-  #pwErr { margin: 4px 0 8px; }
-  #pwErr.ok { color: #0f7b45; }
-  td.staff { font-weight: 700; color: var(--ink); }
+  td.num { font-variant-numeric: tabular-nums; }
+  td.staff, td.person { font-weight: 600; color: var(--ink); }
+  td .handle { color: var(--red); font-weight: 600; text-decoration: none; }
+  td .handle:hover { text-decoration: underline; }
+  td.actions { text-align: right; }
+  .link {
+    padding: 2px 4px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .link:hover { color: var(--red); }
+  .link + .link { margin-left: 10px; }
+  .count-link { color: var(--ink); font-weight: 700; }
+
+  .status { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
+  .status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #c9c5c0; }
+  .status.on { color: var(--ok); }
+  .status.on::before { background: var(--ok); box-shadow: 0 0 0 3px rgba(15,123,69,.15); }
+  .status.off { color: var(--muted); }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background: var(--yellow-tint);
+    border: 1px solid #f2e27a;
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--ink);
+  }
+  .empty { padding: 28px 16px; text-align: center; color: var(--muted); }
+  .filter-note { margin: -4px 0 10px; color: var(--muted); }
+
+  #pwForm input { max-width: 380px; }
+
+  @media (max-width: 600px) {
+    .top img { height: 36px; }
+    .top h1 { font-size: 1.15rem; }
+    .pill { padding: 5px 11px; font-size: .9rem; }
+    .pill .long { display: none; }
+    main { padding-top: 18px; }
+  }
 </style>
 </head>
 <body>
-  <header>
-    <img src="/logo.png" alt="Arawali">
-    <span>Registrations</span>
+  <header class="top">
+    <div class="top-inner">
+      <img src="/logo.png" alt="Arawali" width="108" height="44">
+      <h1>Admin</h1>
+      <nav class="top-actions">
+        <a class="pill" href="/">Registration<span class="long">page</span></a>
+        <button class="pill" id="lock" type="button" hidden>Lock</button>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <form class="login" id="login">
-      <h1>Admin access</h1>
-      <input id="key" name="admin-key" type="password" placeholder="Admin key" autocomplete="off" required>
-      <button class="btn" type="submit">Open</button>
-      <div class="err" id="loginErr"></div>
+    <form class="gate" id="gate" novalidate>
+      <h2>Admin sign in</h2>
+      <p>Enter the admin password to see staff and registrations.</p>
+      <input id="key" name="admin-key" type="password" placeholder="Admin password" autocomplete="off" autofocus>
+      <button class="btn" type="submit">Open admin</button>
+      <div class="note" id="gateNote" role="alert"></div>
     </form>
 
-    <section id="panel" hidden>
-      <h2 class="sec">Staff password</h2>
-      <p class="hint" id="pwStatus">Employees sign in with their name and this password.</p>
-      <form class="toolbar" id="pwForm" novalidate>
-        <input id="pwNew" type="text" placeholder="New staff password (at least 6 characters)" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
-        <button class="btn" type="submit" id="pwBtn">Set password</button>
-      </form>
-      <div class="err" id="pwErr"></div>
+    <div id="panel" hidden>
+      <p class="summary" id="summary"></p>
 
-      <h2 class="sec">Registrations by staff</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Staff name</th><th>Registrations</th><th>Last registration</th></tr></thead>
-          <tbody id="staffRows"></tbody>
-        </table>
-        <div class="empty" id="staffEmpty" hidden>No registrations yet.</div>
-      </div>
+      <section>
+        <div class="sec-head">
+          <h2 class="sec">Employees</h2>
+          <span class="tag" id="onlineTag"></span>
+        </div>
+        <p class="hint">Everyone who has signed in with the staff password. Click a registration count to see their customers.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Status</th><th>Registrations</th><th>Last sign-in</th><th>First sign-in</th><th></th></tr></thead>
+            <tbody id="staffRows"></tbody>
+          </table>
+          <div class="empty" id="staffEmpty" hidden>No one has signed in yet. Employees appear here after they sign in with their name and the staff password.</div>
+        </div>
+      </section>
 
-      <h2 class="sec">Registrations</h2>
-      <div class="toolbar">
-        <span class="count" id="count">0 registered</span>
-        <input id="search" type="search" placeholder="Search name, phone, Instagram or staff…">
-        <button class="btn ghost" id="refresh" type="button">Refresh</button>
-        <button class="btn" id="export" type="button">Download CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Reg. No.</th><th>Name</th><th>Phone</th><th>Instagram</th><th>Registered by</th><th>Registered</th><th></th></tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-        <div class="empty" id="empty" hidden>No registrations yet.</div>
-      </div>
-    </section>
+      <section id="regSection">
+        <div class="sec-head">
+          <h2 class="sec">Registrations</h2>
+          <span class="tag" id="regTag"></span>
+        </div>
+        <div class="toolbar">
+          <input id="search" type="search" placeholder="Search name, phone, Instagram, reg. no. or employee">
+          <button class="btn quiet" id="refresh" type="button">Refresh</button>
+          <button class="btn" id="export" type="button">Download CSV</button>
+        </div>
+        <p class="filter-note" id="filterNote" hidden></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Reg. no.</th><th>Customer</th><th>Phone</th><th>Instagram</th><th>Registered by</th><th>Date</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden>No registrations yet.</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="sec">Staff password</h2>
+        <p class="hint" id="pwStatus"></p>
+        <form class="toolbar" id="pwForm" novalidate>
+          <input id="pwNew" type="text" placeholder="New staff password (at least 6 characters)" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
+          <button class="btn" type="submit" id="pwBtn">Set password</button>
+        </form>
+        <div class="note" id="pwNote" role="status"></div>
+      </section>
+    </div>
   </main>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  let key = sessionStorage.getItem("arawaliAdminKey") || "";
-  let all = [];
+  let key = "";
+  try { key = sessionStorage.getItem("arawaliAdminKey") || ""; } catch {}
+  let registrations = [];
+  let staff = [];
 
-  async function api(path, opts = {}) {
-    const res = await fetch(path, { ...opts, headers: { "x-admin-key": key, ...(opts.headers || {}) } });
-    if (res.status === 401) throw new Error("unauthorized");
-    if (!res.ok) throw new Error((await res.json()).error || "Request failed");
-    return res;
-  }
-
-  async function load() {
-    try {
-      const [data, cfg] = await Promise.all([
-        api("/api/admin/registrations").then((r) => r.json()),
-        api("/api/admin/settings").then((r) => r.json()),
-      ]);
-      all = data.registrations;
-      renderPasswordStatus(cfg);
-      renderStaff();
-      sessionStorage.setItem("arawaliAdminKey", key);
-      $("login").hidden = true;
-      $("panel").hidden = false;
-      render();
-    } catch (err) {
-      sessionStorage.removeItem("arawaliAdminKey");
-      $("login").hidden = false;
-      $("panel").hidden = true;
-      $("loginErr").textContent = err.message === "unauthorized" ? (key ? "Wrong admin key." : "") : err.message;
-    }
-  }
+  const regNo = (r) => "ARW-" + String(r.serial).padStart(4, "0");
+  const staffOf = (r) => r.staffName || "Not recorded";
+  const when = (iso) => iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "—";
+  const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
   function cell(text, cls) {
     const td = document.createElement("td");
@@ -205,25 +295,147 @@
     td.textContent = text;
     return td;
   }
+  function linkButton(text, onClick) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "link";
+    b.textContent = text;
+    b.onclick = onClick;
+    return b;
+  }
 
-  function render() {
+  async function api(path, opts = {}) {
+    const res = await fetch(path, { ...opts, headers: { "x-admin-key": key, ...(opts.headers || {}) } });
+    if (res.status === 401) throw new Error("unauthorized");
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Request failed. Try again.");
+    return res;
+  }
+
+  async function load() {
+    try {
+      const [reg, st, cfg] = await Promise.all([
+        api("/api/admin/registrations").then((r) => r.json()),
+        api("/api/admin/staff").then((r) => r.json()),
+        api("/api/admin/settings").then((r) => r.json()),
+      ]);
+      registrations = reg.registrations;
+      staff = st.staff;
+      try { sessionStorage.setItem("arawaliAdminKey", key); } catch {}
+      $("gate").hidden = true;
+      $("panel").hidden = false;
+      $("lock").hidden = false;
+      renderSummary();
+      renderStaff();
+      renderRegistrations();
+      renderPassword(cfg);
+    } catch (err) {
+      if (err.message === "unauthorized") return lock(key ? "That admin password isn't right." : "");
+      if (!$("panel").hidden) return; // keep showing the last data if a background refresh fails
+      $("gateNote").textContent = "Couldn't load the admin page. Check your connection and try again.";
+    }
+  }
+
+  function lock(message = "") {
+    key = "";
+    try { sessionStorage.removeItem("arawaliAdminKey"); } catch {}
+    $("panel").hidden = true;
+    $("lock").hidden = true;
+    $("gate").hidden = false;
+    $("gateNote").textContent = message;
+    $("key").value = "";
+    $("key").focus();
+  }
+
+  function renderSummary() {
+    const online = staff.filter((s) => s.signedIn).length;
+    const today = new Date().toDateString();
+    const todayCount = registrations.filter((r) => new Date(r.createdAt).toDateString() === today).length;
+    $("summary").innerHTML = "";
+    const parts = [
+      [registrations.length, "registration", " in total"],
+      [todayCount, "registration", " today"],
+      [online, "employee", " signed in now"],
+    ];
+    parts.forEach(([n, word, rest], i) => {
+      const b = document.createElement("strong");
+      b.textContent = plural(n, word);
+      $("summary").append(b, rest + (i < parts.length - 1 ? " · " : ""));
+    });
+    $("onlineTag").textContent = `${online} signed in now`;
+    $("regTag").textContent = plural(registrations.length, "customer");
+  }
+
+  function renderStaff() {
+    const tbody = $("staffRows");
+    tbody.replaceChildren();
+    $("staffEmpty").hidden = staff.length > 0;
+    for (const s of staff) {
+      const tr = document.createElement("tr");
+      tr.append(cell(s.name, "person"));
+
+      const status = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "status " + (s.signedIn ? "on" : "off");
+      badge.textContent = s.signedIn ? "Signed in" : "Signed out";
+      status.append(badge);
+
+      const count = document.createElement("td");
+      count.className = "num";
+      if (s.registrations) {
+        const b = linkButton(String(s.registrations), () => showStaffRegistrations(s.name));
+        b.classList.add("count-link");
+        b.title = `Show ${s.name}'s registrations`;
+        count.append(b);
+      } else count.textContent = "0";
+
+      const actions = document.createElement("td");
+      actions.className = "actions";
+      if (s.signedIn) {
+        actions.append(linkButton("Sign out", async () => {
+          if (!confirm(`Sign out ${s.name} on every device?`)) return;
+          await act(() => api("/api/admin/staff/sign-out", {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: s.name }),
+          }));
+        }));
+      }
+      actions.append(linkButton("Remove", async () => {
+        if (!confirm(`Remove ${s.name} from this list? They'll be signed out. Their registrations stay, and they'll reappear if they sign in again.`)) return;
+        await act(() => api("/api/admin/staff/" + encodeURIComponent(s.name), { method: "DELETE" }));
+      }));
+
+      tr.append(status, count, cell(when(s.lastSeen)), cell(when(s.firstSeen)), actions);
+      tbody.append(tr);
+    }
+  }
+
+  async function act(fn) {
+    try { await fn(); await load(); } catch (err) { alert(err.message); }
+  }
+
+  function showStaffRegistrations(name) {
+    $("search").value = name;
+    renderRegistrations();
+    $("regSection").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderRegistrations() {
     const q = $("search").value.trim().toLowerCase().replace(/^@/, "");
-    const list = all
-      .map((r, i) => ({ ...r, n: i + 1 }))
-      .filter((r) => !q || r.name.toLowerCase().includes(q) || r.phone.includes(q) || r.instagram.includes(q) ||
-        staffOf(r).toLowerCase().includes(q) ||
-        ("arw-" + String(r.serial || r.n).padStart(4, "0")).includes(q))
+    const list = registrations
+      .filter((r) => !q || [r.name, r.phone, r.instagram, staffOf(r), regNo(r)].some((v) => v.toLowerCase().includes(q)))
       .reverse(); // newest first
 
-    $("count").textContent = `${all.length} registered`;
+    const note = $("filterNote");
+    note.hidden = !q;
+    note.textContent = q ? `Showing ${list.length} of ${registrations.length} for “${$("search").value.trim()}”.` : "";
+
     const tbody = $("rows");
     tbody.replaceChildren();
     $("empty").hidden = list.length > 0;
-    $("empty").textContent = all.length ? "No matches." : "No registrations yet.";
+    $("empty").textContent = registrations.length ? "No registrations match your search." : "No registrations yet.";
 
     for (const r of list) {
       const tr = document.createElement("tr");
-      tr.append(cell("ARW-" + String(r.serial || r.n).padStart(4, "0"), "num"), cell(r.name), cell("+91 " + r.phone));
+      tr.append(cell(regNo(r), "num"), cell(r.name, "person"), cell("+91 " + r.phone, "num"));
 
       const ig = document.createElement("td");
       const a = document.createElement("a");
@@ -233,85 +445,57 @@
       a.rel = "noopener";
       a.textContent = "@" + r.instagram;
       ig.append(a);
-      tr.append(ig, cell(staffOf(r), "staff"), cell(new Date(r.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })));
 
-      const act = document.createElement("td");
-      const del = document.createElement("button");
-      del.className = "del";
-      del.textContent = "Remove";
-      del.onclick = async () => {
-        if (!confirm(`Remove @${r.instagram} (${r.name})? This handle will be able to register again.`)) return;
-        try {
-          await api("/api/admin/registrations/" + encodeURIComponent(r.id), { method: "DELETE" });
-          load();
-        } catch (err) { alert(err.message); }
-      };
-      act.append(del);
-      tr.append(act);
+      const actions = document.createElement("td");
+      actions.className = "actions";
+      actions.append(linkButton("Remove", async () => {
+        if (!confirm(`Remove ${regNo(r)}, @${r.instagram} (${r.name})? This Instagram account will be able to register again.`)) return;
+        await act(() => api("/api/admin/registrations/" + encodeURIComponent(r.id), { method: "DELETE" }));
+      }));
+
+      tr.append(ig, cell(staffOf(r), "staff"), cell(when(r.createdAt)), actions);
       tbody.append(tr);
     }
   }
 
-  // Older entries stored the employee's email; newer ones store their name.
-  const staffOf = (r) => r.staffName || r.registeredBy || "Not recorded";
-  const when = (iso) => new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
-
-  function renderPasswordStatus(cfg) {
+  function renderPassword(cfg) {
     $("pwStatus").textContent = cfg.passwordSet
       ? `Employees sign in with their name and this password. Last changed ${when(cfg.passwordUpdatedAt)}. Changing it signs everyone out.`
-      : "No staff password yet. Set one so employees can sign in with their name and this password.";
+      : "No staff password yet. Set one so employees can sign in.";
     $("pwBtn").textContent = cfg.passwordSet ? "Change password" : "Set password";
   }
 
-  function renderStaff() {
-    const byStaff = new Map();
-    for (const r of all) {
-      const s = byStaff.get(staffOf(r)) || { count: 0, last: r.createdAt };
-      s.count += 1;
-      if (r.createdAt > s.last) s.last = r.createdAt;
-      byStaff.set(staffOf(r), s);
-    }
-    const tbody = $("staffRows");
-    tbody.replaceChildren();
-    $("staffEmpty").hidden = byStaff.size > 0;
-    [...byStaff].sort((a, b) => b[1].count - a[1].count).forEach(([name, s]) => {
-      const tr = document.createElement("tr");
-      tr.append(cell(name, "staff"), cell(s.count, "num"), cell(when(s.last)));
-      tbody.append(tr);
-    });
-  }
+  $("gate").addEventListener("submit", (e) => {
+    e.preventDefault();
+    key = $("key").value.trim();
+    if (!key) { $("gateNote").textContent = "Enter the admin password."; return $("key").focus(); }
+    $("gateNote").textContent = "";
+    load();
+  });
+  $("lock").addEventListener("click", () => lock());
 
   $("pwForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const err = $("pwErr");
-    err.className = "err";
-    err.textContent = "";
+    const note = $("pwNote");
+    note.className = "note";
     const password = $("pwNew").value.trim();
-    if (password.length < 6) { err.textContent = "Use at least 6 characters."; return $("pwNew").focus(); }
+    if (password.length < 6) { note.textContent = "Use at least 6 characters."; return $("pwNew").focus(); }
     if ($("pwBtn").textContent === "Change password" &&
         !confirm("Change the staff password? Everyone who is signed in will be signed out.")) return;
     try {
       await api("/api/admin/password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }),
       });
       $("pwNew").value = "";
-      err.className = "err ok";
-      err.textContent = `Password saved: ${password} — share it with your employees.`;
-      const cfg = await (await api("/api/admin/settings")).json();
-      renderPasswordStatus(cfg);
-    } catch (e2) {
-      err.textContent = e2.message;
+      note.className = "note ok";
+      note.textContent = `Password saved: ${password}. Share it with your employees.`;
+      load();
+    } catch (err) {
+      note.textContent = err.message;
     }
   });
 
-  $("login").addEventListener("submit", (e) => {
-    e.preventDefault();
-    key = $("key").value;
-    load();
-  });
-  $("search").addEventListener("input", render);
+  $("search").addEventListener("input", renderRegistrations);
   $("refresh").addEventListener("click", load);
   $("export").addEventListener("click", async () => {
     try {
@@ -323,6 +507,10 @@
       URL.revokeObjectURL(a.href);
     } catch (err) { alert(err.message); }
   });
+
+  // Keep the lists current while the page is open.
+  setInterval(() => { if (key && !document.hidden) load(); }, 30000);
+  document.addEventListener("visibilitychange", () => { if (key && !document.hidden) load(); });
 
   if (key) load();
 </script>

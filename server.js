@@ -230,6 +230,7 @@ async function handle(req, res) {
     loginFails.delete(ip);
     const token = crypto.randomBytes(32).toString("base64url");
     await db.createSession(sha256(token), name, settings.version, Date.now() + SESSION_TTL);
+    await db.recordSignIn(name);
     return send(res, 200, { ok: true }, { "Set-Cookie": sessionCookie(req, token, SESSION_TTL / 1000) });
   }
 
@@ -316,6 +317,23 @@ async function handle(req, res) {
     if (req.method === "DELETE" && url.pathname.startsWith("/api/admin/registrations/")) {
       const id = decodeURIComponent(url.pathname.split("/").pop());
       if (!(await db.deleteRegistration(id))) return send(res, 404, { error: "Not found." });
+      return send(res, 200, { ok: true });
+    }
+
+    if (route === "GET /api/admin/staff") {
+      return send(res, 200, { staff: await db.listStaff(settings.version) });
+    }
+
+    if (route === "POST /api/admin/staff/sign-out") {
+      const body = await readBody(req).catch(() => ({}));
+      const name = normalizeName(body.name);
+      if (!name) return send(res, 400, { error: "Missing staff name." });
+      return send(res, 200, { ok: true, sessionsEnded: await db.signOutStaff(name) });
+    }
+
+    if (req.method === "DELETE" && url.pathname.startsWith("/api/admin/staff/")) {
+      const name = normalizeName(decodeURIComponent(url.pathname.slice("/api/admin/staff/".length)));
+      if (!name || !(await db.removeStaff(name))) return send(res, 404, { error: "Not found." });
       return send(res, 200, { ok: true });
     }
 
