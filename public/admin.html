@@ -158,7 +158,7 @@
   th { font-weight: 600; font-size: .9rem; color: var(--muted); background: #fdfcfa; }
   tr:last-child td { border-bottom: 0; }
   td.num { font-variant-numeric: tabular-nums; }
-  td.staff, td.person { font-weight: 600; color: var(--ink); }
+  td.person { font-weight: 600; color: var(--ink); }
   td .handle { color: var(--red); font-weight: 600; text-decoration: none; }
   td .handle:hover { text-decoration: underline; }
   td.actions { text-align: right; }
@@ -195,7 +195,6 @@
   .empty { padding: 28px 16px; text-align: center; color: var(--muted); }
   .filter-note { margin: -4px 0 10px; color: var(--muted); }
 
-  #pwForm input { max-width: 380px; }
 
   @media (max-width: 600px) {
     .top img { height: 36px; }
@@ -221,7 +220,7 @@
   <main>
     <form class="gate" id="gate" novalidate>
       <h2>Admin sign in</h2>
-      <p>Enter the admin password to see staff and registrations.</p>
+      <p>Enter the admin password to see registrations.</p>
       <input id="key" name="admin-key" type="password" placeholder="Admin password" autocomplete="off" autofocus>
       <button class="btn" type="submit">Open admin</button>
       <div class="note" id="gateNote" role="alert"></div>
@@ -230,50 +229,26 @@
     <div id="panel" hidden>
       <p class="summary" id="summary"></p>
 
-      <section>
-        <div class="sec-head">
-          <h2 class="sec">Employees</h2>
-          <span class="tag" id="onlineTag"></span>
-        </div>
-        <p class="hint">Everyone who has signed in with the staff password. Click a registration count to see their customers.</p>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Name</th><th>Status</th><th>Registrations</th><th>Last sign-in</th><th>First sign-in</th><th></th></tr></thead>
-            <tbody id="staffRows"></tbody>
-          </table>
-          <div class="empty" id="staffEmpty" hidden>No one has signed in yet. Employees appear here after they sign in with their name and the staff password.</div>
-        </div>
-      </section>
-
       <section id="regSection">
         <div class="sec-head">
           <h2 class="sec">Registrations</h2>
           <span class="tag" id="regTag"></span>
         </div>
         <div class="toolbar">
-          <input id="search" type="search" placeholder="Search name, phone, Instagram, reg. no. or employee">
+          <input id="search" type="search" placeholder="Search name, phone, Instagram or reg. no.">
           <button class="btn quiet" id="refresh" type="button">Refresh</button>
           <button class="btn" id="export" type="button">Download CSV</button>
         </div>
         <p class="filter-note" id="filterNote" hidden></p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Reg. no.</th><th>Customer</th><th>Phone</th><th>Instagram</th><th>Registered by</th><th>Date</th><th></th></tr></thead>
+            <thead><tr><th>Reg. no.</th><th>Name</th><th>Phone</th><th>Instagram</th><th>Date</th><th></th></tr></thead>
             <tbody id="rows"></tbody>
           </table>
           <div class="empty" id="empty" hidden>No registrations yet.</div>
         </div>
       </section>
 
-      <section>
-        <h2 class="sec">Staff password</h2>
-        <p class="hint" id="pwStatus"></p>
-        <form class="toolbar" id="pwForm" novalidate>
-          <input id="pwNew" type="text" placeholder="New staff password (at least 6 characters)" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="100">
-          <button class="btn" type="submit" id="pwBtn">Set password</button>
-        </form>
-        <div class="note" id="pwNote" role="status"></div>
-      </section>
     </div>
   </main>
 
@@ -282,11 +257,9 @@
   let key = "";
   try { key = sessionStorage.getItem("arawaliAdminKey") || ""; } catch {}
   let registrations = [];
-  let staff = [];
 
   const regNo = (r) => "ARW-" + String(r.serial).padStart(4, "0");
-  const staffOf = (r) => r.staffName || "Not recorded";
-  const when = (iso) => iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "—";
+  const when = (iso) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
   const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
   function cell(text, cls) {
@@ -294,14 +267,6 @@
     if (cls) td.className = cls;
     td.textContent = text;
     return td;
-  }
-  function linkButton(text, onClick) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "link";
-    b.textContent = text;
-    b.onclick = onClick;
-    return b;
   }
 
   async function api(path, opts = {}) {
@@ -313,25 +278,20 @@
 
   async function load() {
     try {
-      const [reg, st, cfg] = await Promise.all([
-        api("/api/admin/registrations").then((r) => r.json()),
-        api("/api/admin/staff").then((r) => r.json()),
-        api("/api/admin/settings").then((r) => r.json()),
-      ]);
-      registrations = reg.registrations;
-      staff = st.staff;
+      const data = await (await api("/api/admin/registrations")).json();
+      registrations = data.registrations;
       try { sessionStorage.setItem("arawaliAdminKey", key); } catch {}
       $("gate").hidden = true;
       $("panel").hidden = false;
       $("lock").hidden = false;
       renderSummary();
-      renderStaff();
       renderRegistrations();
-      renderPassword(cfg);
     } catch (err) {
       if (err.message === "unauthorized") return lock(key ? "That admin password isn't right." : "");
       if (!$("panel").hidden) return; // keep showing the last data if a background refresh fails
-      $("gateNote").textContent = "Couldn't load the admin page. Check your connection and try again.";
+      $("gateNote").textContent = err.message.startsWith("Too many")
+        ? err.message
+        : "Couldn't load the admin page. Check your connection and try again.";
     }
   }
 
@@ -347,81 +307,21 @@
   }
 
   function renderSummary() {
-    const online = staff.filter((s) => s.signedIn).length;
     const today = new Date().toDateString();
     const todayCount = registrations.filter((r) => new Date(r.createdAt).toDateString() === today).length;
-    $("summary").innerHTML = "";
-    const parts = [
-      [registrations.length, "registration", " in total"],
-      [todayCount, "registration", " today"],
-      [online, "employee", " signed in now"],
-    ];
-    parts.forEach(([n, word, rest], i) => {
-      const b = document.createElement("strong");
-      b.textContent = plural(n, word);
-      $("summary").append(b, rest + (i < parts.length - 1 ? " · " : ""));
-    });
-    $("onlineTag").textContent = `${online} signed in now`;
+    $("summary").replaceChildren();
+    const total = document.createElement("strong");
+    total.textContent = plural(registrations.length, "registration");
+    const daily = document.createElement("strong");
+    daily.textContent = String(todayCount);
+    $("summary").append(total, " in total · ", daily, " today");
     $("regTag").textContent = plural(registrations.length, "customer");
-  }
-
-  function renderStaff() {
-    const tbody = $("staffRows");
-    tbody.replaceChildren();
-    $("staffEmpty").hidden = staff.length > 0;
-    for (const s of staff) {
-      const tr = document.createElement("tr");
-      tr.append(cell(s.name, "person"));
-
-      const status = document.createElement("td");
-      const badge = document.createElement("span");
-      badge.className = "status " + (s.signedIn ? "on" : "off");
-      badge.textContent = s.signedIn ? "Signed in" : "Signed out";
-      status.append(badge);
-
-      const count = document.createElement("td");
-      count.className = "num";
-      if (s.registrations) {
-        const b = linkButton(String(s.registrations), () => showStaffRegistrations(s.name));
-        b.classList.add("count-link");
-        b.title = `Show ${s.name}'s registrations`;
-        count.append(b);
-      } else count.textContent = "0";
-
-      const actions = document.createElement("td");
-      actions.className = "actions";
-      if (s.signedIn) {
-        actions.append(linkButton("Sign out", async () => {
-          if (!confirm(`Sign out ${s.name} on every device?`)) return;
-          await act(() => api("/api/admin/staff/sign-out", {
-            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: s.name }),
-          }));
-        }));
-      }
-      actions.append(linkButton("Remove", async () => {
-        if (!confirm(`Remove ${s.name} from this list? They'll be signed out. Their registrations stay, and they'll reappear if they sign in again.`)) return;
-        await act(() => api("/api/admin/staff/" + encodeURIComponent(s.name), { method: "DELETE" }));
-      }));
-
-      tr.append(status, count, cell(when(s.lastSeen)), cell(when(s.firstSeen)), actions);
-      tbody.append(tr);
-    }
-  }
-
-  async function act(fn) {
-    try { await fn(); await load(); } catch (err) { alert(err.message); }
-  }
-
-  function showStaffRegistrations(name) {
-    $("search").value = name;
-    renderRegistrations();
-    $("regSection").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function renderRegistrations() {
     const q = $("search").value.trim().toLowerCase().replace(/^@/, "");
     const list = registrations
-      .filter((r) => !q || [r.name, r.phone, r.instagram, staffOf(r), regNo(r)].some((v) => v.toLowerCase().includes(q)))
+      .filter((r) => !q || [r.name, r.phone, r.instagram, regNo(r)].some((v) => v.toLowerCase().includes(q)))
       .reverse(); // newest first
 
     const note = $("filterNote");
@@ -448,21 +348,22 @@
 
       const actions = document.createElement("td");
       actions.className = "actions";
-      actions.append(linkButton("Remove", async () => {
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "link";
+      del.textContent = "Remove";
+      del.onclick = async () => {
         if (!confirm(`Remove ${regNo(r)}, @${r.instagram} (${r.name})? This Instagram account will be able to register again.`)) return;
-        await act(() => api("/api/admin/registrations/" + encodeURIComponent(r.id), { method: "DELETE" }));
-      }));
+        try {
+          await api("/api/admin/registrations/" + encodeURIComponent(r.id), { method: "DELETE" });
+          await load();
+        } catch (err) { alert(err.message); }
+      };
+      actions.append(del);
 
-      tr.append(ig, cell(staffOf(r), "staff"), cell(when(r.createdAt)), actions);
+      tr.append(ig, cell(when(r.createdAt)), actions);
       tbody.append(tr);
     }
-  }
-
-  function renderPassword(cfg) {
-    $("pwStatus").textContent = cfg.passwordSet
-      ? `Employees sign in with their name and this password. Last changed ${when(cfg.passwordUpdatedAt)}. Changing it signs everyone out.`
-      : "No staff password yet. Set one so employees can sign in.";
-    $("pwBtn").textContent = cfg.passwordSet ? "Change password" : "Set password";
   }
 
   $("gate").addEventListener("submit", (e) => {
@@ -473,27 +374,6 @@
     load();
   });
   $("lock").addEventListener("click", () => lock());
-
-  $("pwForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const note = $("pwNote");
-    note.className = "note";
-    const password = $("pwNew").value.trim();
-    if (password.length < 6) { note.textContent = "Use at least 6 characters."; return $("pwNew").focus(); }
-    if ($("pwBtn").textContent === "Change password" &&
-        !confirm("Change the staff password? Everyone who is signed in will be signed out.")) return;
-    try {
-      await api("/api/admin/password", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }),
-      });
-      $("pwNew").value = "";
-      note.className = "note ok";
-      note.textContent = `Password saved: ${password}. Share it with your employees.`;
-      load();
-    } catch (err) {
-      note.textContent = err.message;
-    }
-  });
 
   $("search").addEventListener("input", renderRegistrations);
   $("refresh").addEventListener("click", load);
@@ -508,7 +388,7 @@
     } catch (err) { alert(err.message); }
   });
 
-  // Keep the lists current while the page is open.
+  // Keep the list current while the page is open.
   setInterval(() => { if (key && !document.hidden) load(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (key && !document.hidden) load(); });
 

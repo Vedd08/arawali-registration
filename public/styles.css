@@ -355,90 +355,25 @@ footer {
   .ticket::before, .ticket::after { top: 74px; }
 }
 
-/* ---------- signed-in employee bar (registration page) ---------- */
-.staffbar {
+/* ---------- admin link (top right of the registration page) ---------- */
+.admin-link {
   position: absolute;
-  top: 14px; left: 16px; right: 16px;
+  top: 14px; right: 16px;
   z-index: 3;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  color: #fff;
-  font-size: .95rem;
-}
-.who {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  max-width: calc(50% - 190px); /* never runs under the centred logo */
-  padding: 5px 14px 5px 5px;
-  border-radius: 999px;
-  background: rgba(60,0,0,.22);
-}
-.who .avatar {
-  flex: none;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--ink);
-  font-weight: 700;
-  font-size: .9rem;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  text-transform: uppercase;
-}
-.who .email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.signout {
-  flex: none;
   padding: 5px 16px;
   border: 1.5px solid rgba(255,255,255,.6);
   border-radius: 999px;
-  background: transparent;
   color: #fff;
   font-weight: 600;
-  cursor: pointer;
+  font-size: .95rem;
+  text-decoration: none;
   transition: background-color .15s, color .15s;
 }
-.signout:hover { background: #fff; color: var(--red); }
-a.signout { text-decoration: none; font-size: .95rem; line-height: 1.5; }
-.staff-actions { flex: none; display: flex; gap: 8px; }
+.admin-link:hover { background: #fff; color: var(--red); }
 
-/* ---------- info message (yellow) ---------- */
-.msg.info {
-  padding: 12px 14px;
-  color: #574800;
-  background: var(--yellow-tint);
-  border: 1px solid #f2e27a;
-  border-radius: 12px;
-}
-.msg.info .icon { display: block; }
-
-/* ---------- sign-in: show / hide password ---------- */
-.reveal {
-  flex: none;
-  width: 48px;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 0 12px 12px 0;
-  background: none;
-  color: #a8a29e;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: color .15s;
-}
-.reveal:hover, .reveal.on { color: var(--ink); }
-.reveal .i-hide, .reveal.on .i-show { display: none; }
-.reveal.on .i-hide { display: block; }
-.reveal:focus-visible { outline-offset: -3px; }
 [hidden] { display: none !important; }
 
 @media (max-width: 560px) {
-  .hero.has-bar { height: 322px; padding-top: 62px; }
-  .who { max-width: calc(100% - 180px); }
-  .signout { padding: 5px 12px; }
+  .hero { padding-top: 56px; height: 318px; }
+  .admin-link { top: 12px; right: 12px; padding: 4px 14px; }
 }

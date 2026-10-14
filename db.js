@@ -18,7 +18,6 @@ const toRegistration = (row) => ({
   name: row.name,
   phone: row.phone,
   instagram: row.instagram,
-  staffName: row.staff_name,
   createdAt: row.created_at.toISOString(),
 });
 
@@ -30,62 +29,33 @@ async function setup() {
       name        text NOT NULL,
       phone       text NOT NULL,
       instagram   text NOT NULL UNIQUE,
-      staff_name  text,
+      staff_name  text,  -- from the earlier staff sign-in version; no longer filled
       created_at  timestamptz NOT NULL DEFAULT now()
     );
     CREATE TABLE IF NOT EXISTS settings (
       key    text PRIMARY KEY,
       value  jsonb NOT NULL
     );
-    CREATE TABLE IF NOT EXISTS sessions (
-      token_hash  text PRIMARY KEY,
-      name        text NOT NULL,
-      version     integer NOT NULL,
-      expires     timestamptz NOT NULL
-    );
-    -- Everyone who has signed in, kept after their session ends.
-    -- name_key is the lowercase name, so "Priya" and "priya" are one person.
-    CREATE TABLE IF NOT EXISTS staff (
-      name_key    text PRIMARY KEY,
-      name        text NOT NULL,
-      first_seen  timestamptz NOT NULL DEFAULT now(),
-      last_seen   timestamptz NOT NULL DEFAULT now(),
-      sign_ins    integer NOT NULL DEFAULT 1
-    );
   `);
   await importJsonFiles();
-  // Staff who signed in or registered someone before the staff list existed.
-  await query(`
-    INSERT INTO staff (name_key, name, first_seen, last_seen, sign_ins)
-    SELECT lower(name), min(name), now(), now(), count(*) FROM sessions GROUP BY lower(name)
-    ON CONFLICT DO NOTHING;
-    INSERT INTO staff (name_key, name, first_seen, last_seen, sign_ins)
-    SELECT lower(staff_name), min(staff_name), min(created_at), max(created_at), 0
-    FROM registrations WHERE staff_name IS NOT NULL GROUP BY lower(staff_name)
-    ON CONFLICT DO NOTHING;
-  `);
 }
 
 // One-time move of the records the app kept in data/*.json before it used a database.
+// Runs only on a brand-new database (no settings row yet), so entries removed on the
+// admin page never come back from the old files.
 async function importJsonFiles() {
-  const dir = path.join(__dirname, "data");
-  const read = (file) => {
-    const p = path.join(dir, file);
-    return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : null;
-  };
+  const { rows: done } = await query("SELECT 1 FROM settings LIMIT 1");
+  if (done.length) return;
 
-  // Only a brand-new database is filled from the files. Once settings exist, the
-  // database is the record, so entries removed on the admin page stay removed.
-  if (await getSettings()) return;
-
+  const file = path.join(__dirname, "data", "registrations.json");
+  const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : [];
   const { rows } = await query("SELECT count(*)::int AS n FROM registrations");
-  const old = read("registrations.json");
-  if (rows[0].n === 0 && old && old.length) {
+  if (rows[0].n === 0 && old.length) {
     for (const [i, r] of old.entries()) {
       await query(
-        `INSERT INTO registrations (id, serial, name, phone, instagram, staff_name, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING`,
-        [r.id, r.serial || i + 1, r.name, r.phone, r.instagram, r.staffName || r.registeredBy || null, r.createdAt]
+        `INSERT INTO registrations (id, serial, name, phone, instagram, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`,
+        [r.id, r.serial || i + 1, r.name, r.phone, r.instagram, r.createdAt]
       );
     }
     // Continue numbering after the imported entries.
@@ -94,98 +64,9 @@ async function importJsonFiles() {
     );
     console.log(`Imported ${old.length} registration(s) from data/registrations.json.`);
   }
-
-  const oldSettings = read("settings.json");
-  if (oldSettings && oldSettings.staffPassword && !(await getSettings())) {
-    await saveSettings(oldSettings);
-    console.log("Imported the staff password from data/settings.json.");
-  }
-}
-
-// ----- settings: { staffPassword: { salt, hash }, version, passwordUpdatedAt } -----
-
-async function getSettings() {
-  const { rows } = await query("SELECT value FROM settings WHERE key = 'app'");
-  return rows[0] ? rows[0].value : null;
-}
-
-async function saveSettings(value) {
   await query(
-    `INSERT INTO settings (key, value) VALUES ('app', $1)
-     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
-    [JSON.stringify(value)]
+    "INSERT INTO settings (key, value) VALUES ('imported', to_jsonb(now())) ON CONFLICT DO NOTHING"
   );
-}
-
-// ----- sessions -----
-
-async function createSession(tokenHash, name, version, expires) {
-  await query("DELETE FROM sessions WHERE expires < now()");
-  await query("INSERT INTO sessions (token_hash, name, version, expires) VALUES ($1, $2, $3, $4)", [
-    tokenHash,
-    name,
-    version,
-    new Date(expires),
-  ]);
-}
-
-async function findSession(tokenHash) {
-  const { rows } = await query("SELECT name, version FROM sessions WHERE token_hash = $1 AND expires > now()", [
-    tokenHash,
-  ]);
-  return rows[0] || null;
-}
-
-const deleteSession = (tokenHash) => query("DELETE FROM sessions WHERE token_hash = $1", [tokenHash]);
-const deleteAllSessions = () => query("DELETE FROM sessions");
-
-// ----- staff -----
-
-// The list keeps the first spelling used, so "Priya" stays "Priya" if she later types "priya".
-async function recordSignIn(name) {
-  await query(
-    `INSERT INTO staff (name_key, name) VALUES (lower($1), $1)
-     ON CONFLICT (name_key) DO UPDATE
-       SET last_seen = now(), sign_ins = staff.sign_ins + 1`,
-    [name]
-  );
-}
-
-// Every employee who has signed in, with how many customers they registered and
-// whether they are signed in right now (an unexpired session from the current password).
-async function listStaff(version) {
-  const { rows } = await query(
-    `SELECT s.name, s.first_seen, s.last_seen, s.sign_ins,
-            (SELECT count(*)::int FROM registrations r WHERE lower(r.staff_name) = s.name_key) AS registrations,
-            (SELECT max(r.created_at) FROM registrations r WHERE lower(r.staff_name) = s.name_key) AS last_registration,
-            EXISTS (SELECT 1 FROM sessions x WHERE lower(x.name) = s.name_key
-                      AND x.expires > now() AND x.version = $1) AS signed_in
-     FROM staff s
-     ORDER BY signed_in DESC, s.last_seen DESC`,
-    [version]
-  );
-  return rows.map((r) => ({
-    name: r.name,
-    firstSeen: r.first_seen.toISOString(),
-    lastSeen: r.last_seen.toISOString(),
-    signIns: r.sign_ins,
-    registrations: r.registrations,
-    lastRegistration: r.last_registration ? r.last_registration.toISOString() : null,
-    signedIn: r.signed_in,
-  }));
-}
-
-// Signs the employee out on every device. Returns how many sessions ended.
-async function signOutStaff(name) {
-  const { rowCount } = await query("DELETE FROM sessions WHERE lower(name) = lower($1)", [name]);
-  return rowCount;
-}
-
-// Removes an employee from the staff list and signs them out. Their registrations keep their name.
-async function removeStaff(name) {
-  await signOutStaff(name);
-  const { rowCount } = await query("DELETE FROM staff WHERE name_key = lower($1)", [name]);
-  return rowCount > 0;
 }
 
 // ----- registrations -----
@@ -197,15 +78,15 @@ async function isRegistered(instagram) {
 
 // Returns the new registration, or null if the Instagram handle is already taken.
 // The UNIQUE constraint makes this safe even when two requests arrive at once.
-async function addRegistration({ id, name, phone, instagram, staffName }) {
+async function addRegistration({ id, name, phone, instagram }) {
   // Checking first keeps registration numbers gap-free: Postgres uses up a number
   // on every rejected insert, so only a true same-moment race can skip one.
   if (await isRegistered(instagram)) return null;
   try {
     const { rows } = await query(
-      `INSERT INTO registrations (id, name, phone, instagram, staff_name)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [id, name, phone, instagram, staffName]
+      `INSERT INTO registrations (id, name, phone, instagram)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [id, name, phone, instagram]
     );
     return toRegistration(rows[0]);
   } catch (err) {
@@ -226,20 +107,4 @@ async function deleteRegistration(id) {
   return rowCount > 0;
 }
 
-module.exports = {
-  setup,
-  getSettings,
-  saveSettings,
-  createSession,
-  findSession,
-  deleteSession,
-  deleteAllSessions,
-  recordSignIn,
-  listStaff,
-  signOutStaff,
-  removeStaff,
-  isRegistered,
-  addRegistration,
-  listRegistrations,
-  deleteRegistration,
-};
+module.exports = { setup, isRegistered, addRegistration, listRegistrations, deleteRegistration };

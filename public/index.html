@@ -14,17 +14,8 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="hero has-bar">
-    <div class="staffbar">
-      <div class="who" title="Signed-in employee">
-        <span class="avatar" id="avatar" aria-hidden="true"></span>
-        <span class="email" id="staffEmail">Signed in</span>
-      </div>
-      <div class="staff-actions">
-        <a class="signout" href="/admin">Admin</a>
-        <button class="signout" id="signout" type="button">Sign out</button>
-      </div>
-    </div>
+  <header class="hero">
+    <a class="admin-link" href="/admin">Admin</a>
     <div class="brand">
       <img src="/logo.png" alt="Arawali" width="340" height="138">
       <p class="tagline" lang="hi">क्योंकि सेहत से समझौता नहीं</p>
@@ -143,21 +134,6 @@
   }
   const setStatus = (s) => (igStatus.className = "status" + (s ? " " + s : ""));
 
-  // ----- signed-in employee -----
-  const toLogin = () => location.replace("/login");
-  fetch("/api/auth/me")
-    .then((res) => (res.status === 401 ? toLogin() : res.json()))
-    .then((me) => {
-      if (!me) return;
-      $("staffEmail").textContent = me.name;
-      $("avatar").textContent = me.name[0];
-    })
-    .catch(() => {});
-  $("signout").addEventListener("click", async () => {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    toLogin();
-  });
-
   $("phone").addEventListener("input", (e) => {
     e.target.value = e.target.value.replace(/[^\d ]/g, "");
     setMsg("phone", "");
@@ -177,9 +153,9 @@
     checkTimer = setTimeout(async () => {
       try {
         const res = await fetch("/api/check?handle=" + encodeURIComponent(value));
-        if (res.status === 401) return toLogin();
         const data = await res.json();
         if (seq !== checkSeq) return;
+        if (!res.ok) { setStatus(""); return; }
         if (!data.valid) { setStatus(""); setMsg("instagram", "Use only letters, numbers, dots and underscores.", "error"); }
         else if (!data.available) { setStatus(""); setMsg("instagram", DUPLICATE, "error"); }
         else { setStatus("ok"); setMsg("instagram", `@${data.handle} is available`, "ok"); }
@@ -216,10 +192,6 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (res.status === 401) {
-        setMsg("form", "Your session has ended. Taking you to sign in…", "error");
-        return setTimeout(toLogin, 1500);
-      }
       const data = await res.json();
       if (!res.ok) {
         const message = res.status === 409 ? DUPLICATE : data.error;
