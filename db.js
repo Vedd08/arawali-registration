@@ -5,7 +5,10 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
+// Neon's URLs say sslmode=require, which pg 8 already treats as full certificate
+// checking (verify-full). Saying so explicitly keeps that strict behaviour in pg 9.
+const connectionString = process.env.DATABASE_URL.replace(/([?&]sslmode=)(require|prefer|verify-ca)\b/, "$1verify-full");
+const pool = new Pool({ connectionString, max: 5 });
 
 const query = (text, params) => pool.query(text, params);
 

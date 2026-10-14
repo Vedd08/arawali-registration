@@ -5,12 +5,15 @@
   "description": "Arawali registration desk — one registration per Instagram account",
   "main": "server.js",
   "scripts": {
-    "start": "node --env-file-if-exists=.env server.js"
+    "start": "node --env-file-if-exists=.env server.js",
+    "build": "node --check server.js && node --check db.js && echo Build OK"
   },
   "engines": {
     "node": ">=22.9"
   },
   "dependencies": {
+    "@neon/config": "^1.9.1",
+    "@neon/env": "^1.6.2",
     "pg": "^8.23.1"
   }
 }
