@@ -13,6 +13,10 @@ if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL is not set. Add your Neon connection string to .env (see .env.example).");
   process.exit(1);
 }
+if (process.env.RENDER && !process.env.ADMIN_KEY) {
+  console.error("ADMIN_KEY is not set. Add it under the service's Environment tab on Render.");
+  process.exit(1);
+}
 const db = require("./db");
 
 // 4500 rather than 3000: dev servers like Vite/React often hold localhost:3000 on IPv6,
