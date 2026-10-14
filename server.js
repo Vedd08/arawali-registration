@@ -9,6 +9,13 @@ const path = require("path");
 const crypto = require("crypto");
 const os = require("os");
 
+// Values copied from a .env file often keep their quotes or a "NAME=" prefix when
+// pasted into a host's settings page. Clean those off so the app still starts.
+for (const name of ["DATABASE_URL", "ADMIN_KEY"]) {
+  const raw = process.env[name];
+  if (raw) process.env[name] = raw.trim().replace(new RegExp(`^${name}=`), "").replace(/^(["'])(.*)\1$/, "$2").trim();
+}
+
 if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL is not set. Add your Neon connection string to .env (see .env.example).");
   process.exit(1);
