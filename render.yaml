@@ -1,0 +1,15 @@
+# Render blueprint: New > Blueprint, pick this repo, then fill in the two secrets it asks for.
+services:
+  - type: web
+    name: arawali-registration
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /api/ping
+    envVars:
+      - key: DATABASE_URL # Neon connection string
+        sync: false
+      - key: ADMIN_KEY # password for /admin
+        sync: false

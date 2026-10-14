@@ -1,0 +1,16 @@
+{
+  "name": "arawali-registration",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arawali registration desk — one registration per Instagram account",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js"
+  },
+  "engines": {
+    "node": ">=22.9"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

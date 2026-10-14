@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e31e24">
+<title>Arawali Registration</title>
+<meta name="description" content="Register for Arawali with your name, phone number and Instagram handle.">
+<link rel="icon" href="/logo.png">
+<link rel="preload" as="image" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="hero has-bar">
+    <div class="staffbar">
+      <div class="who" title="Signed-in employee">
+        <span class="avatar" id="avatar" aria-hidden="true"></span>
+        <span class="email" id="staffEmail">Signed in</span>
+      </div>
+      <button class="signout" id="signout" type="button">Sign out</button>
+    </div>
+    <div class="brand">
+      <img src="/logo.png" alt="Arawali" width="340" height="138">
+      <p class="tagline" lang="hi">क्योंकि सेहत से समझौता नहीं</p>
+    </div>
+    <svg class="wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="#ffdd00" d="M0,30 C280,4 540,96 820,90 C1090,84 1270,40 1440,22 L1440,120 L0,120 Z"/>
+      <path fill="#f3f3f4" d="M0,48 C280,22 540,114 820,108 C1090,102 1270,58 1440,40 L1440,120 L0,120 Z"/>
+    </svg>
+  </header>
+
+  <div class="wrap">
+    <main class="card" id="card">
+      <form id="form" novalidate>
+        <div class="head">
+          <h1><span class="brandword">Arawali</span> Registration</h1>
+          <p>Register your details below</p>
+        </div>
+
+        <div class="field">
+          <label for="name">Full name</label>
+          <div class="control" data-for="name">
+            <span class="lead" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </span>
+            <input id="name" name="name" autocomplete="name" placeholder="Enter your full name" maxlength="80" aria-describedby="name-msg">
+          </div>
+          <div class="msg" id="name-msg" role="alert"></div>
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <div class="control" data-for="phone">
+            <span class="lead" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/></svg>
+            </span>
+            <span class="prefix">+91</span>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit mobile number" maxlength="14" aria-describedby="phone-msg">
+          </div>
+          <div class="msg" id="phone-msg" role="alert"></div>
+        </div>
+
+        <div class="field">
+          <label for="instagram">Instagram handle</label>
+          <div class="control" data-for="instagram">
+            <span class="lead" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg>
+            </span>
+            <input id="instagram" name="instagram" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@username" maxlength="120" aria-describedby="instagram-msg">
+            <span class="status" id="igStatus" aria-hidden="true">
+              <svg class="i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+              <svg class="i-ok" width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#0f7b45"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <div class="msg" id="instagram-msg" role="alert"></div>
+        </div>
+
+        <div class="msg" id="form-msg" role="alert" style="margin-top:20px"></div>
+
+        <button class="submit" id="submit" type="submit">
+          <span id="submitLabel">Submit Registration</span>
+          <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          <svg class="spinner" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+        </button>
+
+        <p class="fine">Each Instagram handle can be registered only once.</p>
+      </form>
+
+      <section class="success" aria-live="polite">
+        <div class="seal">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h2 id="doneTitle" tabindex="-1">You're registered!</h2>
+        <p>Thank you for registering with Arawali.</p>
+
+        <div class="ticket">
+          <div class="ticket-top">
+            <span>Registration no.</span>
+            <strong id="tNo"></strong>
+          </div>
+          <dl>
+            <dt>Name</dt><dd id="tName"></dd>
+            <dt>Instagram</dt><dd id="tHandle"></dd>
+            <dt>Registered on</dt><dd id="tDate"></dd>
+          </dl>
+        </div>
+        <p class="keep">Take a screenshot of this for your records.</p>
+
+        <button class="again" id="again" type="button">Register another person</button>
+      </section>
+    </main>
+
+    <footer>© Arawali</footer>
+  </div>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const form = $("form"), card = $("card"), submitBtn = $("submit"), submitLabel = $("submitLabel");
+  const igStatus = $("igStatus");
+  const ICON = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#e31e24"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.5" fill="#fff"/></svg>';
+  const DUPLICATE = "This Instagram account has already been registered.";
+
+  // state: "error" (red box), "ok" (green text), or empty to clear
+  function setMsg(id, text, state) {
+    const box = $(id + "-msg");
+    box.className = "msg" + (text ? " show " + state : "");
+    box.innerHTML = text ? ICON + "<span></span>" : "";
+    if (text) box.querySelector("span").textContent = text;
+    const control = document.querySelector(`.control[data-for="${id}"]`);
+    if (control) {
+      control.classList.toggle("is-error", state === "error");
+      control.classList.toggle("is-ok", state === "ok");
+      $(id).setAttribute("aria-invalid", state === "error" ? "true" : "false");
+    }
+  }
+  const setStatus = (s) => (igStatus.className = "status" + (s ? " " + s : ""));
+
+  // ----- signed-in employee -----
+  const toLogin = () => location.replace("/login");
+  fetch("/api/auth/me")
+    .then((res) => (res.status === 401 ? toLogin() : res.json()))
+    .then((me) => {
+      if (!me) return;
+      $("staffEmail").textContent = me.name;
+      $("avatar").textContent = me.name[0];
+    })
+    .catch(() => {});
+  $("signout").addEventListener("click", async () => {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    toLogin();
+  });
+
+  $("phone").addEventListener("input", (e) => {
+    e.target.value = e.target.value.replace(/[^\d ]/g, "");
+    setMsg("phone", "");
+  });
+  $("name").addEventListener("input", () => setMsg("name", ""));
+
+  // Live availability check — the server re-checks on submit, so this is only a hint.
+  let checkTimer, checkSeq = 0;
+  $("instagram").addEventListener("input", (e) => {
+    setMsg("form", "");
+    clearTimeout(checkTimer);
+    const value = e.target.value.trim();
+    setMsg("instagram", "");
+    if (!value) return setStatus("");
+    setStatus("spin");
+    const seq = ++checkSeq;
+    checkTimer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/check?handle=" + encodeURIComponent(value));
+        if (res.status === 401) return toLogin();
+        const data = await res.json();
+        if (seq !== checkSeq) return;
+        if (!data.valid) { setStatus(""); setMsg("instagram", "Use only letters, numbers, dots and underscores.", "error"); }
+        else if (!data.available) { setStatus(""); setMsg("instagram", DUPLICATE, "error"); }
+        else { setStatus("ok"); setMsg("instagram", `@${data.handle} is available`, "ok"); }
+      } catch {
+        if (seq === checkSeq) setStatus("");
+      }
+    }, 350);
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (submitBtn.classList.contains("loading")) return;
+    setMsg("form", "");
+
+    const payload = {
+      name: $("name").value.trim(),
+      phone: $("phone").value.trim(),
+      instagram: $("instagram").value.trim(),
+    };
+
+    let firstBad = null;
+    if (payload.name.length < 2) { setMsg("name", "Enter your full name.", "error"); firstBad ??= "name"; }
+    if (!/^[6-9]\d{9}$/.test(payload.phone.replace(/\s/g, "").replace(/^(91|0)(?=\d{10}$)/, ""))) {
+      setMsg("phone", "Enter a valid 10-digit mobile number.", "error"); firstBad ??= "phone";
+    }
+    if (!payload.instagram) { setMsg("instagram", "Enter your Instagram handle.", "error"); firstBad ??= "instagram"; }
+    if (firstBad) return $(firstBad).focus();
+
+    submitBtn.classList.add("loading");
+    submitLabel.textContent = "Submitting…";
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 401) {
+        setMsg("form", "Your session has ended. Taking you to sign in…", "error");
+        return setTimeout(toLogin, 1500);
+      }
+      const data = await res.json();
+      if (!res.ok) {
+        const message = res.status === 409 ? DUPLICATE : data.error;
+        if (data.field) { setStatus(""); setMsg(data.field, message, "error"); $(data.field).focus(); }
+        else setMsg("form", message || "Registration failed. Try again.", "error");
+        return;
+      }
+      showTicket(data.registration);
+    } catch {
+      setMsg("form", "Couldn't reach the registration server. Check your connection and try again.", "error");
+    } finally {
+      submitBtn.classList.remove("loading");
+      submitLabel.textContent = "Submit Registration";
+    }
+  });
+
+  function showTicket(r) {
+    $("tNo").textContent = "ARW-" + String(r.serial).padStart(4, "0");
+    $("tName").textContent = r.name;
+    $("tHandle").textContent = "@" + r.instagram;
+    $("tDate").textContent = new Date(r.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+    card.classList.add("done");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    $("doneTitle").focus({ preventScroll: true });
+    confetti();
+  }
+
+  $("again").addEventListener("click", () => {
+    form.reset();
+    ["name", "phone", "instagram", "form"].forEach((f) => setMsg(f, ""));
+    setStatus("");
+    card.classList.remove("done");
+    $("name").focus();
+  });
+
+  // One short burst in brand colours when a registration succeeds.
+  function confetti() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const canvas = $("confetti"), ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+    const colors = ["#e31e24", "#ffdd00", "#ffffff", "#2b2a29"];
+    const originY = Math.min(innerHeight * 0.32, 300);
+    const bits = Array.from({ length: 140 }, () => {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.9;
+      const speed = 7 + Math.random() * 9;
+      return {
+        x: innerWidth / 2, y: originY,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        w: 6 + Math.random() * 6, h: 4 + Math.random() * 6,
+        r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.3,
+        c: colors[(Math.random() * colors.length) | 0],
+      };
+    });
+    const start = performance.now();
+    (function frame(now) {
+      const t = now - start;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      ctx.globalAlpha = Math.max(0, 1 - t / 2200);
+      for (const b of bits) {
+        b.vy += 0.32; b.vx *= 0.985; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+        ctx.fillStyle = b.c;
+        if (b.c === "#ffffff") { ctx.strokeStyle = "rgba(43,42,41,.25)"; ctx.lineWidth = 1; ctx.strokeRect(-b.w / 2, -b.h / 2, b.w, b.h); }
+        ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+        ctx.restore();
+      }
+      if (t < 2200) requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    })(start);
+  }
+</script>
+</body>
+</html>
